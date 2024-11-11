@@ -1,51 +1,84 @@
-import React, { useState } from 'react';
-import { saveToLocalStorage, getFromLocalStorage } from './LocalStorageHelper';
-import './Usermanagement.css'; // Import the CSS file for styling
+import React, { useState, useEffect } from 'react';
+import './Usermanagement.css';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState(getFromLocalStorage('users') || []);
+  const [users, setUsers] = useState([]);
   const [user, setUser] = useState({ name: '', password: '' });
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUserIndex, setCurrentUserIndex] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [message, setMessage] = useState(''); // State to hold success message
+
+  useEffect(() => {
+    // Fetch existing users from the backend when the component mounts
+    const fetchUsers = async () => {
+      const response = await fetch('http://localhost:5000/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data); // Assuming the response returns an array of users
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const handleInputChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleAddUser = (e) => {
+  const handleAddUser = async (e) => {
     e.preventDefault();
-    const updatedUsers = [...users, user];
-    saveToLocalStorage('users', updatedUsers);
-    setUsers(updatedUsers);
-    setUser({ name: '', password: '' });
-    setMessage(''); // Clear any previous message
+    const response = await fetch('http://localhost:5000/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user),
+    });
+
+    if (response.ok) {
+      const newUser = await response.json();
+      setUsers([...users, newUser]); // Add new user to the list
+      setUser({ name: '', password: '' });
+      setMessage('User added successfully');
+    } else {
+      setMessage('Error adding user');
+    }
   };
 
-  const deleteUser = (index) => {
-    const updatedUsers = users.filter((_, idx) => idx !== index);
-    saveToLocalStorage('users', updatedUsers);
-    setUsers(updatedUsers);
-    setMessage('User deleted successfully'); // Set success message
+  const deleteUser = async (id) => {
+    const response = await fetch(`http://localhost:5000/users/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      setUsers(users.filter(user => user.id !== id)); // Assuming each user has a unique ID
+      setMessage('User deleted successfully');
+    } else {
+      setMessage('Error deleting user');
+    }
   };
 
   const editUser = (index) => {
     setUser(users[index]);
     setIsEditing(true);
-    setCurrentUserIndex(index);
-    setMessage(''); // Clear any previous message
+    setCurrentUserId(users[index].id); // Use the user id for updates
   };
 
-  const handleUpdateUser = (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
-    const updatedUsers = [...users];
-    updatedUsers[currentUserIndex] = user;
-    saveToLocalStorage('users', updatedUsers);
-    setUsers(updatedUsers);
-    setUser({ name: '', password: '' });
-    setIsEditing(false);
-    setCurrentUserIndex(null);
-    setMessage('User updated successfully'); // Set success message
+    const response = await fetch(`http://localhost:5000/users/${currentUserId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user),
+    });
+
+    if (response.ok) {
+      const updatedUser = await response.json();
+      setUsers(users.map(u => (u.id === currentUserId ? updatedUser : u))); // Update user in the list
+      setUser({ name: '', password: '' });
+      setIsEditing(false);
+      setCurrentUserId(null);
+      setMessage('User updated successfully');
+    } else {
+      setMessage('Error updating user');
+    }
   };
 
   return (
@@ -76,21 +109,11 @@ const UserManagement = () => {
 
       <h3>Current Users</h3>
       <ul>
-        {users.map((user, index) => (
-          <li key={index}>
-            {user.name} ({user.password ? '****' : 'No Password'}){' '}
-            <button
-              className="edit-button"
-              onClick={() => editUser(index)}
-            >
-              Edit
-            </button>
-            <button
-              className="delete-button"
-              onClick={() => deleteUser(index)}
-            >
-              Delete
-            </button>
+        {users.map((u, index) => (
+          <li key={u.id}>
+            {u.name} ({u.password ? '' : 'Password'}){' '}
+            <button className="edit-button" onClick={() => editUser(index)}>Edit</button>
+            <button className="delete-button" onClick={() => deleteUser(u.id)}>Delete</button>
           </li>
         ))}
       </ul>

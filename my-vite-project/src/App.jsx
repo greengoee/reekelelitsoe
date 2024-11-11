@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
-import Dashboard from './DashBoard';
+import Dashboard from './Dashboard';
 import ProductForm from './ProductForm';
 import ProductList from './ProductList';
 import UserManagement from './UserManagement';

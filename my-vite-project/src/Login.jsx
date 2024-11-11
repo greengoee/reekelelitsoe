@@ -1,27 +1,39 @@
-// src/components/Login.js
+
 import React, { useState } from 'react';
-import { getFromLocalStorage } from './LocalStorageHelper';
-import './Login.css'; // Import the CSS file
+import './Login.css'; 
 
 function Login({ onLogin, goToSignUp }) {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState(''); // State for success message
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const users = getFromLocalStorage('users') || [];
-    
-    const user = users.find((user) => user.name === name && user.password === password);
 
-    if (user) {
-      setMessage('Login successful!'); // Set success message
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message); 
+        return;
+      }
+
+      const result = await response.json();
+      setMessage('Login successful!');
       setTimeout(() => {
-        onLogin(user); // Pass the logged-in user to the parent component after a short delay
-        setMessage(''); // Clear the message
-      }, 1000); // Delay of 1 second for the success message to show
-    } else {
-      alert('Invalid name or password. Please try again.');
+        onLogin(result.user); 
+        setMessage(''); // Clear the message//
+      }, 1000); 
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('An error occurred. Please try again later.');
     }
   };
 

@@ -52,9 +52,65 @@
   }
   
   .no-products {
-    text-align: center; /* Center the "No products" text */
+    text-align: center; 
     color: #999; 
     font-size: 18px; 
     margin-top: 20px; 
   }
   
+
+  .rotating-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20vh;
+  }
+  
+  .rotating-image {
+    width: 200px;
+    height: auto;
+    animation: rotate 10s linear infinite;
+  }
+  
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .image-carousel {
+    position: relative;
+    overflow: hidden;
+}
+
+.animated-image {
+    position: absolute;
+    width: 20%;
+    height: 10;
+    opacity: 0;
+    align-content: center;
+    animation: rotateImage 20s infinite;
+}
+
+@keyframes rotateImage {
+    0%, 100% {
+        opacity: 1;
+        transform: rotate(0deg);
+    }
+    25% {
+        opacity: 10;
+        transform: rotate(90deg);
+    }
+    50% {
+        opacity: 10;
+        transform: rotate(180deg);
+    }
+    75% {
+        opacity: 1;
+        transform: rotate(270deg);
+    }
+}
+

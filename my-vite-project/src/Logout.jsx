@@ -1,4 +1,4 @@
-// src/components/Logout.js
+
 import React from 'react';
 import { removeFromLocalStorage } from './LocalStorageHelper';
 

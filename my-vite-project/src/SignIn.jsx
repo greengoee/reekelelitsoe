@@ -1,47 +1,54 @@
-// src/components/SignIn.js
+
 import React, { useState } from 'react';
-import { saveToLocalStorage, getFromLocalStorage } from './LocalStorageHelper';
 import './Signin.css';
 
 const SignIn = ({ onSignIn }) => {
   const [user, setUser] = useState({ name: '', password: '' });
-  const [message, setMessage] = useState(''); // State for success message
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const users = getFromLocalStorage('users') || [];
+    setError('');
 
-    // Check if a user with the same name already exists
-    const userExists = users.find(existingUser => existingUser.name === user.name);
-    if (userExists) {
-      alert("User with this name already exists. Please choose another name.");
-      return;
-    }
-
-    // Check if all fields are filled (though 'required' attribute already ensures this)
     if (!user.name || !user.password) {
-      alert('Please fill all fields.');
+      setError('Please fill all fields.');
       return;
     }
 
-    users.push(user); // Save the new user with name and password
-    saveToLocalStorage('users', users);
-    setMessage('Sign up successful!'); // Set success message
+    try {
+      const response = await fetch('http://localhost:5000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
 
-    setTimeout(() => {
-      onSignIn(user); // Trigger sign-in after showing the message
-      setMessage(''); // Clear the message
-    }, 1000); // Delay of 1 second
+      if (!response.ok) {
+        throw new Error('User already exists.');
+      }
+
+      const result = await response.json();
+      setMessage('Sign up successful!');
+
+      setTimeout(() => {
+        onSignIn(result); // Call the onSignIn prop with user data
+      }, 1000);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
     <div className="sign-in">
       <h2>Sign Up</h2>
-      {message && <div className="success-message">{message}</div>} {/* Display success message */}
+      {message && <div className="success-message">{message}</div>}
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <input
           type="text"

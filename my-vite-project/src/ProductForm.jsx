@@ -1,6 +1,5 @@
-// src/components/ProductForm.js
+
 import React, { useState } from 'react';
-import { saveToLocalStorage, getFromLocalStorage } from './LocalStorageHelper';
 import './Productform.css'; 
 
 const ProductForm = ({ onFormSubmit }) => {
@@ -12,35 +11,53 @@ const ProductForm = ({ onFormSubmit }) => {
     quantity: '',
   });
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // New error message state//
 
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check for empty fields
+    // Check for empty fields//
     if (!product.name || !product.description || !product.category || !product.price || !product.quantity) {
       alert('Please fill in all fields.');
       return;
     }
 
-    let products = getFromLocalStorage('products') || [];
-    products.push(product);
-    saveToLocalStorage('products', products);
-    onFormSubmit();
+    try {
+      // POST request to the backend
+      const response = await fetch('http://localhost:5000/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product),
+      });
 
-    // Show success message
-    setSuccessMessage('Product added successfully!');
+      if (!response.ok) {
+        throw new Error('Failed to add product');
+      }
 
-    // Clear the form
-    setProduct({ name: '', description: '', category: '', price: '', quantity: '' });
+      const addedProduct = await response.json(); // Get the added product details//
 
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setSuccessMessage('');
-    }, 3000);
+      // Optionally use addedProduct to update state or UI//
+      console.log('Added Product:', addedProduct);
+
+      // Show success message
+      setSuccessMessage('Product added successfully!');
+
+      // Clear the form
+      setProduct({ name: '', description: '', category: '', price: '', quantity: '' });
+      onFormSubmit();
+
+      // Hide success message after 3 seconds//
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    } catch (error) {
+      setErrorMessage(error.message); // Handle error message//
+      console.error('Error adding product:', error);
+    }
   };
 
   return (
@@ -90,6 +107,13 @@ const ProductForm = ({ onFormSubmit }) => {
       {successMessage && (
         <div className="success-message">
           {successMessage}
+        </div>
+      )}
+
+      {/* Optional: Error message */}
+      {errorMessage && (
+        <div className="error-message">
+          {errorMessage}
         </div>
       )}
     </div>

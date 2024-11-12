@@ -12,10 +12,9 @@ const PORT = 5000;
 
 // Database connection
 const connection = mysql.createConnection({
-  host: 'localhost',  
-  port: 3307,          
+  host: 'localhost',           
   user: 'root',
-  password: 'root',
+  password: 'kwala7',
   database: 'stock_inventory',
 });
 
@@ -122,7 +121,7 @@ app.post('/login', (req, res) => {
 
 // Get all users
 app.get('/users', (req, res) => {
-  const sql = 'SELECT id, name FROM Users'; 
+  const sql = 'SELECT id, name FROM users'; 
   connection.query(sql, (err, results) => {
     if (err) return res.status(500).json({ message: 'Server error' });
     res.json(results);
@@ -133,16 +132,25 @@ app.get('/users', (req, res) => {
 app.post('/users', (req, res) => {
   const { name, password } = req.body;
 
-  // Hash the password before saving
-  const saltRounds = 10;
-  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-    if (err) return res.status(500).json({ message: 'Error hashing password' });
+  // Checking if the user already exists
+  const checkUserSql = 'SELECT * FROM Users WHERE name = ?';
+  connection.query(checkUserSql, [name], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Server error' });
+    }
 
-    const sql = 'INSERT INTO Users (name, password) VALUES (?, ?)';
-    connection.query(sql, [name, hashedPassword], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Server error' });
+    if (results.length > 0) {
+      // when User already exists
+      return res.status(409).json({ message: 'User already exists' });
+    }
 
-      res.status(201).json({ id: result.insertId, name });
+    // Insert new user
+    const insertUserSql = 'INSERT INTO Users (name, password) VALUES (?, ?)';
+    connection.query(insertUserSql, [name, password], (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: 'Server error' });
+      }
+      res.status(201).json({ message: 'Sign up successful!' });
     });
   });
 });
@@ -152,22 +160,24 @@ app.put('/users/:id', (req, res) => {
   const { id } = req.params;
   const { name, password } = req.body;
 
-  // Hash the new password before updating
-  const saltRounds = 10;
-  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-    if (err) return res.status(500).json({ message: 'Error hashing password' });
+  // Validate input
+  if (!name || !password) {
+    return res.status(400).json({ message: 'Name and password are required.' });
+  }
 
-    const sql = 'UPDATE Users SET name = ?, password = ? WHERE id = ?';
-    connection.query(sql, [name, hashedPassword, id], (err, result) => {
-      if (err) return res.status(500).json({ message: 'Server error' });
+  // Prepare SQL query to update user
+  const sql = 'UPDATE users SET name = ?, password = ? WHERE id = ?';
+  connection.query(sql, [name, password, id], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Server error' });
 
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json({ id: parseInt(id), name });
-    });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ id: parseInt(id), name }); // Return updated user information
   });
 });
+
 
 // Deleting a user
 app.delete('/users/:id', (req, res) => {

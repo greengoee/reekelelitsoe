@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import './Login.css'; 
 
 function Login({ onLogin, goToSignUp }) {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState(''); // State for success message
+  const [message, setMessage] = useState(''); 
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +28,7 @@ function Login({ onLogin, goToSignUp }) {
       setMessage('Login successful!');
       setTimeout(() => {
         onLogin(result.user); 
-        setMessage(''); // Clear the message//
+        setMessage(''); 
       }, 1000); 
     } catch (error) {
       console.error('Error during login:', error);

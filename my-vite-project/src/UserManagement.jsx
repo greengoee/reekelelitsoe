@@ -26,21 +26,38 @@ const UserManagement = () => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:5000/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user),
-    });
-
-    if (response.ok) {
-      const newUser = await response.json();
-      setUsers([...users, newUser]); // Add new user to the list
-      setUser({ name: '', password: '' });
-      setMessage('User added successfully');
-    } else {
-      setMessage('Error adding user');
+  
+    // Check if required fields are filled
+    if (!user.name || !user.password) {
+      setMessage('Please fill in all fields.');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:5000/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user),
+      });
+  
+      if (response.ok) {
+        const newUser = await response.json();
+        setUsers([...users, newUser]); // Add new user to the list
+        setUser({ name: '', password: '' }); // Clear input fields
+        setMessage('User added successfully');
+        
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setMessage('');
+        }, 3000);
+      } else {
+        setMessage('Error adding user');
+      }
+    } catch (error) {
+      setMessage('Error adding user: ' + error.message);
     }
   };
+  
 
   const deleteUser = async (id) => {
     const response = await fetch(`http://localhost:5000/users/${id}`, {
@@ -56,30 +73,53 @@ const UserManagement = () => {
   };
 
   const editUser = (index) => {
-    setUser(users[index]);
+    const userToEdit = users[index];
+    setUser({ name: userToEdit.name, password: '' });
     setIsEditing(true);
-    setCurrentUserId(users[index].id); // Use the user id for updates
+    setCurrentUserId(userToEdit.id); 
   };
-
+  
   const handleUpdateUser = async (e) => {
     e.preventDefault();
-    const response = await fetch(`http://localhost:5000/users/${currentUserId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user),
-    });
-
-    if (response.ok) {
-      const updatedUser = await response.json();
-      setUsers(users.map(u => (u.id === currentUserId ? updatedUser : u))); // Update user in the list
-      setUser({ name: '', password: '' });
-      setIsEditing(false);
-      setCurrentUserId(null);
-      setMessage('User updated successfully');
-    } else {
-      setMessage('Error updating user');
+  
+    // Check if required fields are filled
+    if (!user.name || !user.password) {
+      setMessage('Please fill in all fields.');
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:5000/users/${currentUserId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user),
+      });
+  
+      if (response.ok) {
+        const updatedUser = await response.json();
+        
+        // Update user in the list
+        setUsers(users.map(u => (u.id === currentUserId ? { ...u, ...updatedUser } : u)));
+        
+        // Clear the form and reset states
+        setUser({ name: '', password: '' });
+        setIsEditing(false);
+        setCurrentUserId(null);
+        setMessage('User updated successfully');
+  
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setMessage('');
+        }, 3000);
+      } else {
+        const errorData = await response.json();
+        setMessage(errorData.message || 'Error updating user');
+      }
+    } catch (error) {
+      setMessage('Error updating user: ' + error.message);
     }
   };
+  
 
   return (
     <div className="user-management">

@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import './Signin.css';
 
-const SignIn = ({ onSignIn }) => {
+const SignIn = ({ onSignIn, goToLogin }) => {
   const [user, setUser] = useState({ name: '', password: '' });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -68,6 +67,7 @@ const SignIn = ({ onSignIn }) => {
         />
         <button type="submit">Sign Up</button>
       </form>
+      <button onClick={goToLogin} className="login-button">Go to Login</button>
     </div>
   );
 };

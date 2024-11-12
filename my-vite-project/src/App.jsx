@@ -43,6 +43,10 @@ function App() {
     setIsSignUp(true);
   };
 
+  const goToLogin = () => {
+    setIsSignUp(false); // Switch to Login view
+  };
+
   return (
     <Router>
       <div className="App">
@@ -53,7 +57,7 @@ function App() {
         {!user ? (
           <div>
             {isSignUp ? (
-              <SignIn onSignIn={handleSignIn} />
+              <SignIn onSignIn={handleSignIn} goToLogin={goToLogin} />
             ) : (
               <Login onLogin={handleLogin} goToSignUp={goToSignUp} />
             )}

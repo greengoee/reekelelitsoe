@@ -20,7 +20,7 @@ const SignIn = ({ onSignIn, goToLogin }) => {
     }
 
     try {
-      const response = await fetch('https://reekelelitsoe-backend.onrender.com/signup', {
+      const response = await fetch('https://reekelelitsoe-backend.onrender.com:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

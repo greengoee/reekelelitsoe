@@ -20,7 +20,7 @@ const SignIn = ({ onSignIn, goToLogin }) => {
     }
 
     try {
-      const response = await fetch('https:localhost:5000/signup', {
+      const response = await fetch('https://localhost:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

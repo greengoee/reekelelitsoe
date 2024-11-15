@@ -6,7 +6,9 @@ const cors=require('cors');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://reekelelitsoe-backend.onrender.com'
+}));
 app.use(bodyParser.json());
 const PORT = 5000;
 

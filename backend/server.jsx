@@ -8,6 +8,8 @@ const bcrypt = require('bcryptjs');
 const app = express();
 app.use(cors({
   origin: 'https://reekelelitsoe-33qq.onrender.com'
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
 }));
 app.use(bodyParser.json());
 const PORT = 5000;

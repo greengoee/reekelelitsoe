@@ -18,9 +18,10 @@ const SignIn = ({ onSignIn, goToLogin }) => {
       setError('Please fill all fields.');
       return;
     }
+    const BASE_URL = "https://reekelelitsoe-backend.onrender.com";
 
     try {
-      const response = await fetch('https://reekelelitsoe-backend.onrender.com/signup', {
+      const response = await fetch(`${BASE_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

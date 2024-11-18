@@ -21,7 +21,7 @@ const SignIn = ({ onSignIn, goToLogin }) => {
     const BASE_URL = "https://reekelelitsoe-backend.onrender.com";
 
     try {
-      const response = await fetch(`${BASE_URL}/5000/signup`, {
+      const response = await fetch(`${BASE_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

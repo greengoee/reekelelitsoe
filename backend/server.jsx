@@ -10,7 +10,7 @@ const allowedOrigins = ["https://reekelelitsoe-33qq.onrender.com"];
 
 app.use(cors({
   origin: allowedOrigins,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  methods: "GET,PUT,POST,DELETE",
 }));
 app.use(bodyParser.json());
 const PORT = 5000;

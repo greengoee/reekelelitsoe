@@ -11,9 +11,10 @@ const allowedOrigins = ["https://reekelelitsoe-33qq.onrender.com"];
 app.use(cors({
   origin: allowedOrigins,
   methods: "GET,PUT,POST,DELETE",
+  credentials: true,
 }));
 app.use(bodyParser.json());
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Database connection
 const connection = mysql.createConnection({
@@ -21,7 +22,7 @@ const connection = mysql.createConnection({
   port:3307,
   user: 'root',
   password: 'root',
-  database: 'stock_inventory'
+  database: 'stock_inventory',
 });
 
 connection.connect((err) => {

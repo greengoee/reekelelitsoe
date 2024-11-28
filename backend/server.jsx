@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 const allowedOrigins = ["https://reekelelitsoe-33qq.onrender.com"];
+const PORT=5000;
 
 app.use(cors({
   origin: allowedOrigins,

@@ -14,7 +14,6 @@ app.use(cors({
   credentials: true,
 }));
 app.use(bodyParser.json());
-const PORT = process.env.PORT || 5000;
 
 // Database connection
 const connection = mysql.createConnection({

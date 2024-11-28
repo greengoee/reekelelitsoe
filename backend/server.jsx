@@ -26,9 +26,9 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) {
-    console.error('Error connecting to MAMP MySQL database:', err);
+    console.error('Error connecting to MySQL database:', err);
   } else {
-    console.log('Connected to MAMP MySQL database.');
+    console.log('Connected to MySQL database.');
   }
 });
 

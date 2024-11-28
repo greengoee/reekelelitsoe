@@ -19,9 +19,8 @@ const PORT = process.env.PORT || 5000;
 // Database connection
 const connection = mysql.createConnection({
   host: 'localhost', 
-  port:3307,
   user: 'root',
-  password: 'root',
+  password: 'kwala7',
   database: 'stock_inventory',
 });
 
